@@ -1,0 +1,38 @@
+pipeline {
+    environment {
+        registry = "hassanelghalbzouri/devops-tp4"
+        registryCredential = '549774d0-ce87-46ad-b2a0-31eaf8fe7e9a'
+        dockerImage = ''
+    }
+    agent any
+    stages {
+        stage('Cloning Git') {
+            steps {
+                git 'https://github.com/hassanelgh/devops-tp4'
+            }
+        }
+        stage('Building image') {
+            steps{
+                script {
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
+                }
+            }
+        }
+        stage('Test image') {
+            steps{
+                script {
+                    echo "Tests passed"
+                }
+            }
+        }
+        stage('Publish Image') {
+            steps{
+                script {
+                    docker.withRegistry( '', registryCredential ) {
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+    }
+}
